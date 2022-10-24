@@ -144,15 +144,13 @@ func FindDependencies(pac ToDo) (map[ToDo]bool, error) {
 		return nil, err
 	}
 	for _, target := range data.DependencyGroups {
-		if target.TargetFramework == "net6.0" {
-			if len(target.Dependencies) != 0 {
-				for _, slice := range target.Dependencies {
-					reg := regexp.MustCompile("[][, )]")
-					depVersion := reg.ReplaceAllString(slice.Range, "${1}")
-					depName := strings.ToLower(slice.DependencyID)
-					newDep := ToDo{depName, depVersion}
-					p[newDep] = false
-				}
+		if len(target.Dependencies) != 0 {
+			for _, slice := range target.Dependencies {
+				reg := regexp.MustCompile("[][, )]")
+				depVersion := reg.ReplaceAllString(slice.Range, "${1}")
+				depName := strings.ToLower(slice.DependencyID)
+				newDep := ToDo{depName, depVersion}
+				p[newDep] = false
 			}
 		}
 	}

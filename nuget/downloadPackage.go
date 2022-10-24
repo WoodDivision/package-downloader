@@ -31,14 +31,24 @@ func DownloadNuget(packageName string, packageVersion string, repository string)
 		}
 		date := service.CheckDate(nuget.Published)
 		if date == true {
-			log.Printf("Package: %s, version %s, published: %s", pac.Name, pac.Version, nuget.Published.Format("2006-01-02 15:04:05"))
+			log.Printf(
+				"Package: %s, version %s, published: %s",
+				pac.Name,
+				pac.Version,
+				nuget.Published.Format("2006-01-02 15:04:05"),
+			)
 			err = service.DownloadFile(nuget.PackageContent, fileName)
 			if err != nil {
 				return
 			}
 			log.Printf("Downloaded")
 		} else {
-			log.Printf("Package: %s, version %s, published: %s", pac.Name, pac.Version, nuget.Published.Format("2006-01-02 15:04:05"))
+			log.Printf(
+				"Package: %s, version %s, published: %s",
+				pac.Name,
+				pac.Version,
+				nuget.Published.Format("2006-01-02 15:04:05"),
+			)
 			log.Printf("Skip")
 		}
 	}
