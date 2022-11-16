@@ -7,10 +7,12 @@ import (
 	"strings"
 )
 
+const NUGET_URL = "https://api.nuget.org/v3/registration5-gz-semver2"
+
 func DownloadNuget(packageName string, packageVersion string, repository string) {
 	name := strings.ToLower(packageName)
 	pac := ToDo{name, packageVersion}
-	packageToDownload, err := FindDependencies(pac)
+	packageToDownload, err := CheckDependency(pac)
 	if err != nil {
 		return
 	}

@@ -49,8 +49,8 @@ var nuget *Package
 func FindPackage(packageName string, packageVersion string) (*Package, error) {
 	name := strings.ToLower(packageName)
 	version := packageVersion
-	apiURL := fmt.Sprintf("https://api.nuget.org/v3/registration5-gz-semver2/%s/%s.json", name, version)
-
+	endpoint := fmt.Sprintf("/%s/%s.json", name, version)
+	apiURL := NUGET_URL + endpoint
 	resp, err := http.Get(apiURL)
 	if err != nil {
 		log.Print("Wrong request.Check that you enter correct package name or version ")

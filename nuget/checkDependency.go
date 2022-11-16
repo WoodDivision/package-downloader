@@ -137,7 +137,7 @@ var (
 	metaData *MetaData
 )
 
-func FindDependencies(pac ToDo) (map[ToDo]bool, error) {
+func CheckDependency(pac ToDo) (map[ToDo]bool, error) {
 	data, err := findMetaData(pac.Name, pac.Version)
 	if err != nil {
 		log.Print("Can't find MetaData for package ")
@@ -159,7 +159,7 @@ func FindDependencies(pac ToDo) (map[ToDo]bool, error) {
 			break
 		}
 		p[pac] = true
-		return FindDependencies(pac)
+		return CheckDependency(pac)
 	}
 	return p, nil
 }
