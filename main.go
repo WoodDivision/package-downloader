@@ -29,9 +29,11 @@ func main() {
 	case "composer":
 		fmt.Print("here will be a composer package downloader section")
 	case "npm":
-		npmPac, _ := npm.GetPackage(packageName, packageVersion)
-		npmDep, _ := npm.GetDependencies(npmPac)
-		log.Print(npmDep)
+		pac := npm.ToDo{Name: packageName, Version: packageVersion}
+		npmDep, _ := npm.CheckDependency(pac)
+		//log.Printf("%v", npmPac.Versions[packageVersion].Dependencies)
+		log.Printf("%v", npmDep)
+		log.Printf("%s", len(npmDep))
 	default:
 		fmt.Print("here will be a default downloader section")
 	}

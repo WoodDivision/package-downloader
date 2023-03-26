@@ -10,28 +10,23 @@ type ToDo struct {
 	Version string
 }
 
-var d = make(map[ToDo]bool)
+var p = make(map[ToDo]bool)
 
-func GetDependencies(p *Package) (map[ToDo]bool, error) {
-	for name, version := range p.Dependencies {
-		reg := regexp.MustCompile("[/^]")
+func CheckDependency(pac ToDo) (map[ToDo]bool, error) {
+	npmPac, _ := GetPackage(pac.Name)
+	for name, version := range npmPac.Versions[pac.Version].Dependencies {
+		reg := regexp.MustCompile("[/^|~]")
 		depVersion := reg.ReplaceAllString(version, "")
 		newDep := ToDo{Name: name, Version: depVersion}
-		d[newDep] = false
+		p[newDep] = false
 	}
-
-	for pac, load := range d {
-		log.Printf("Processing package %s, %s ", pac.Name, pac.Version)
+	for pac, load := range p {
 		if load == true {
-			break
+			continue
 		}
-		d[pac] = true
-		nextPac, err := GetPackage(pac.Name, pac.Version)
-		if err != nil {
-			log.Print(err.Error())
-			return nil, err
-		}
-		return GetDependencies(nextPac)
+		log.Printf("Processing package %s, %s ", pac.Name, pac.Version)
+		p[pac] = true
+		return CheckDependency(pac)
 	}
-	return d, nil
+	return p, nil
 }

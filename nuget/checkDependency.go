@@ -156,7 +156,7 @@ func CheckDependency(pac ToDo) (map[ToDo]bool, error) {
 	}
 	for pac, load := range p {
 		if load == true {
-			break
+			continue
 		}
 		p[pac] = true
 		return CheckDependency(pac)

@@ -10,55 +10,43 @@ import (
 )
 
 type Package struct {
+	Id       string             `json:"_id"`
+	Rev      string             `json:"_rev"`
+	Name     string             `json:"name"`
+	DistTags struct{}           `json:"dist-tags"`
+	Versions map[string]Version `json:"versions"`
+	Time     map[string]string  `json:"time"`
+}
+
+type Version struct {
 	Name            string            `json:"name"`
 	Version         string            `json:"version"`
-	Description     string            `json:"description"`
-	Main            string            `json:"main"`
-	Scripts         map[string]string `json:"scripts"`
-	Repository      Repository        `json:"repository"`
-	Engines         Engines           `json:"engines"`
 	Dependencies    map[string]string `json:"dependencies"`
 	DevDependencies map[string]string `json:"devDependencies"`
-	GitHead         string            `json:"gitHead"`
-	Homepage        string            `json:"homepage"`
 	Id              string            `json:"_id"`
 	NodeVersion     string            `json:"_nodeVersion"`
 	NpmVersion      string            `json:"_npmVersion"`
 	Dist            Dist              `json:"dist"`
 }
 
-type Repository struct {
-	Type      string `json:"type"`
-	Url       string `json:"url"`
-	Directory string `json:"directory"`
-}
-
-type Engines struct {
-	Node string `json:"node"`
-}
 type Dist struct {
-	Integrity    string       `json:"integrity"`
-	Shasum       string       `json:"shasum"`
-	Tarball      string       `json:"tarball"`
-	FileCount    int          `json:"fileCount"`
-	UnpackedSize int          `json:"unpackedSize"`
-	Signatures   []Signatures `json:"signatures"`
-	NpmSignature string       `json:"npm-signature"`
-}
-
-type Signatures struct {
-	Keyid string `json:"keyid"`
-	Sig   string `json:"sig"`
+	Shasum     string `json:"shasum"`
+	Tarball    string `json:"tarball"`
+	Integrity  string `json:"integrity"`
+	Signatures []struct {
+		Keyid string `json:"keyid"`
+		Sig   string `json:"sig"`
+	} `json:"signatures"`
 }
 
 var npm *Package
 
 const NPM_URL = "https://registry.npmjs.org"
 
-func GetPackage(packageName string, packageVersion string) (*Package, error) {
+func GetPackage(packageName string) (*Package, error) {
 	name := strings.ToLower(packageName)
-	version := packageVersion
-	endpoint := fmt.Sprintf("/%s/%s", name, version)
+	//version := packageVersion
+	endpoint := fmt.Sprintf("/%s", name)
 	apiURL := NPM_URL + endpoint
 	resp, err := http.Get(apiURL)
 	if err != nil {
@@ -78,6 +66,5 @@ func GetPackage(packageName string, packageVersion string) (*Package, error) {
 		log.Print(err.Error())
 		return nil, err
 	}
-
 	return npm, nil
 }
