@@ -12,36 +12,9 @@ import (
 
 type Package struct {
 	Id             string    `json:"@id"`
-	Type           []string  `json:"@type"`
 	CatalogEntry   string    `json:"catalogEntry"`
-	Listed         bool      `json:"listed"`
 	PackageContent string    `json:"packageContent"`
 	Published      time.Time `json:"published"`
-	Registration   string    `json:"registration"`
-	Context        Context   `json:"@context"`
-}
-type Context struct {
-	Vocab          string         `json:"@vocab"`
-	Xsd            string         `json:"xsd"`
-	CatalogEntry   CatalogEntry   `json:"catalogEntry"`
-	Registration   Registration   `json:"registration"`
-	PackageContent PackageContent `json:"packageContent"`
-	Published      Published      `json:"published"`
-}
-
-type CatalogEntry struct {
-	Type string `json:"@type"`
-}
-
-type Registration struct {
-	Type string `json:"@type"`
-}
-
-type PackageContent struct {
-	Type string `json:"@type"`
-}
-type Published struct {
-	Type string `json:"@type"`
 }
 
 var nuget *Package

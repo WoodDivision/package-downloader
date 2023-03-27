@@ -12,13 +12,7 @@ import (
 
 type MetaData struct {
 	Id                       string             `json:"@id"`
-	Type                     []string           `json:"@type"`
-	Authors                  string             `json:"authors"`
-	CatalogCommitId          string             `json:"catalog:commitId"`
-	CatalogCommitTimeStamp   time.Time          `json:"catalog:commitTimeStamp"`
-	Copyright                string             `json:"copyright"`
 	Created                  time.Time          `json:"created"`
-	Description              string             `json:"description"`
 	FrameworkReferences      string             `json:"frameworkReferences"`
 	IconFile                 string             `json:"iconFile"`
 	IdMain                   string             `json:"id"`
@@ -38,9 +32,6 @@ type MetaData struct {
 	VerbatimVersion          string             `json:"verbatimVersion"`
 	Version                  string             `json:"version"`
 	DependencyGroups         []DependencyGroups `json:"dependencyGroups"`
-	PackageEntries           []PackageEntries   `json:"packageEntries"`
-	Tags                     []string           `json:"tags"`
-	PackageContext           PackageContext     `json:"@context"`
 }
 type DependencyGroups struct {
 	Id              string         `json:"@id"`
@@ -55,31 +46,6 @@ type Dependencies struct {
 	DependencyID string `json:"id"`
 	Range        string `json:"range"`
 }
-type PackageEntries struct {
-	Id               string `json:"@id"`
-	Type             string `json:"@type"`
-	CompressedLength int    `json:"compressedLength"`
-	FullName         string `json:"fullName"`
-	Length           int    `json:"length"`
-	Name             string `json:"name"`
-}
-type PackageContext struct {
-	Vocab                   string                  `json:"@vocab"`
-	Catalog                 string                  `json:"catalog"`
-	Xsd                     string                  `json:"xsd"`
-	DependenciesContext     DependenciesContext     `json:"dependencies"`
-	DependencyGroupsContext DependencyGroupsContext `json:"dependencyGroups"`
-	PackageEntriesContext   PackageEntriesContext   `json:"packageEntries"`
-	PackageTypes            PackageTypes            `json:"packageTypes"`
-	SupportedFrameworks     SupportedFrameworks     `json:"supportedFrameworks"`
-	Tags                    Tags                    `json:"tags"`
-	Vulnerabilities         Vulnerabilities         `json:"vulnerabilities"`
-	PublishedType           PublishedType           `json:"published"`
-	Created                 Created                 `json:"created"`
-	LastEdited              LastEdited              `json:"lastEdited"`
-	CatalogCommitTimeStamp  CatalogCommitTimeStamp  `json:"catalog:commitTimeStamp"`
-	Reasons                 Reasons                 `json:"reasons"`
-}
 
 type DependenciesContext struct {
 	Id        string `json:"@id"`
@@ -89,44 +55,6 @@ type DependencyGroupsContext struct {
 	Id        string `json:"@id"`
 	Container string `json:"@container"`
 }
-type PackageEntriesContext struct {
-	Id        string `json:"@id"`
-	Container string `json:"@container"`
-}
-type PackageTypes struct {
-	Id        string `json:"@id"`
-	Container string `json:"@container"`
-}
-type SupportedFrameworks struct {
-	Id        string `json:"@id"`
-	Container string `json:"@container"`
-}
-
-type Tags struct {
-	Id        string `json:"@id"`
-	Container string `json:"@container"`
-}
-type Vulnerabilities struct {
-	Id        string `json:"@id"`
-	Container string `json:"@container"`
-}
-type PublishedType struct {
-	Type string `json:"@type"`
-}
-type Created struct {
-	Type string `json:"@type"`
-}
-type LastEdited struct {
-	Type string `json:"@type"`
-}
-
-type CatalogCommitTimeStamp struct {
-	Type string `json:"@type"`
-}
-type Reasons struct {
-	Container string `json:"@container"`
-}
-
 type ToDo struct {
 	Name    string
 	Version string
@@ -144,7 +72,7 @@ func CheckDependency(pac ToDo) (map[ToDo]bool, error) {
 		return nil, err
 	}
 	for _, target := range data.DependencyGroups {
-		if len(target.Dependencies) != 0 {
+		if target.TargetFramework == "net6.0" {
 			for _, slice := range target.Dependencies {
 				reg := regexp.MustCompile("[][, )]")
 				depVersion := reg.ReplaceAllString(slice.Range, "${1}")
@@ -154,12 +82,13 @@ func CheckDependency(pac ToDo) (map[ToDo]bool, error) {
 			}
 		}
 	}
-	for pac, load := range p {
+	for dep, load := range p {
 		if load == true {
 			continue
 		}
-		p[pac] = true
-		return CheckDependency(pac)
+		log.Printf("Processing package %s, %s ", dep.Name, dep.Version)
+		p[dep] = true
+		return CheckDependency(dep)
 	}
 	return p, nil
 }
