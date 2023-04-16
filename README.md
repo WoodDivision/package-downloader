@@ -1,4 +1,4 @@
-# nuget-downloader
+# package-downloader
 
 ## Установка
 1. Скачать репозиторий
@@ -14,10 +14,10 @@ export PATH=$PATH:/Users/user/go/bin
 ## Использование
 
 ````shell
-nuget-downloader -n PackageName -v PackageVersion -r Nexus-repository
+package-downloader -n PackageName -v PackageVersion -t (npm/nuget)
 ````
 -n - указывает какой пакет необходимо найти
 
 -v - указывает какой версии пакет должен соответствовать 
 
--r (необязательный) - указывает репозиторий в Action-Nexus ( по умолчанию nuget-freeze )
+-t - указать тип пакета
