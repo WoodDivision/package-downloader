@@ -1,5 +1,5 @@
-module nuget-downloader
+module package-downloader
 
-go 1.18
+go 1.20
 
-require github.com/andelf/go-curl v0.0.0-20200630032108-fd49ff24ed97
+require github.com/hashicorp/go-version v1.6.0 // indirect

@@ -6,6 +6,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"os"
 	"time"
 )
 
@@ -49,9 +50,11 @@ type Nuget struct {
 	Version         string `json:"version"`
 }
 
+var nexusUrl = os.Getenv("NEXUS_URL")
+
 func CheckNexus(packageName string, packageVersion string, repository string) (Item, error) {
 
-	apiURL := fmt.Sprintf("http://nexus00.infra.prod.msk2.sl.amedia.tech/service/rest/v1/search?repository=%s&name=%s&version=%s", repository, packageName, packageVersion)
+	apiURL := fmt.Sprintf("%s/service/rest/v1/search?repository=%s&name=%s&version=%s", nexusUrl, repository, packageName, packageVersion)
 
 	resp, err := http.Get(apiURL)
 	if err != nil {

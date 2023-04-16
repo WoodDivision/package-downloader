@@ -1,17 +1,13 @@
-package nuget
+package npm
 
 import (
 	"fmt"
 	"log"
 	"package-downloader/service"
-	"strings"
 )
 
-const NUGET_URL = "https://api.nuget.org/v3/registration5-gz-semver2"
-
-func DownloadNuget(packageName string, packageVersion string, repository string) {
-	name := strings.ToLower(packageName)
-	pac := ToDo{name, packageVersion}
+func DownloadNpm(packageName string, packageVersion string, repository string) {
+	pac := ToDo{Name: packageName, Version: packageVersion}
 	packageToDownload, err := CheckDependency(pac)
 	if err != nil {
 		return
@@ -23,23 +19,20 @@ func DownloadNuget(packageName string, packageVersion string, repository string)
 		//	log.Print("Package already in Nexus")
 		//	return
 		//}
+		npm, err := GetNpmPackage(pac.Name)
 		if err != nil {
 			return
 		}
-		fileName := fmt.Sprintf("%s.%s.nupkg", pac.Name, pac.Version)
-		nuget, err := GetNugetPackage(pac.Name, pac.Version)
-		if err != nil {
-			return
-		}
-		date := service.CheckDate(nuget.Published)
+		fileName := fmt.Sprintf("%s-%s.tar", service.NormalizeName(pac.Name), pac.Version)
+		date := service.CheckDate(npm.Time[pac.Version])
 		if date == true {
 			log.Printf(
 				"Package: %s, version %s, published: %s",
 				pac.Name,
 				pac.Version,
-				nuget.Published.Format("2006-01-02 15:04:05"),
+				npm.Time[pac.Version].Format("2006-01-02 15:04:05"),
 			)
-			err = service.DownloadFile(nuget.PackageContent, fileName)
+			err = service.DownloadFile(npm.Versions[pac.Version].Dist.Tarball, fileName)
 			if err != nil {
 				log.Printf("Can's save the file")
 				return
@@ -50,7 +43,7 @@ func DownloadNuget(packageName string, packageVersion string, repository string)
 				"Package: %s, version %s, published: %s",
 				pac.Name,
 				pac.Version,
-				nuget.Published.Format("2006-01-02 15:04:05"),
+				npm.Time[pac.Version].Format("2006-01-02 15:04:05"),
 			)
 			log.Printf("Skip")
 		}

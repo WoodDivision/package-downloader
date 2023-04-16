@@ -4,8 +4,9 @@ import (
 	"flag"
 	"fmt"
 	"log"
-	"nuget-downloader/nuget"
 	"os"
+	"package-downloader/npm"
+	"package-downloader/nuget"
 )
 
 var (
@@ -28,7 +29,7 @@ func main() {
 	case "composer":
 		fmt.Print("here will be a composer package downloader section")
 	case "npm":
-		fmt.Print("here will be a npm pacakge downloader section")
+		npm.DownloadNpm(packageName, packageVersion, repository)
 	default:
 		fmt.Print("here will be a default downloader section")
 	}
