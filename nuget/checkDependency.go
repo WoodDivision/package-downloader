@@ -5,7 +5,7 @@ import (
 	"io"
 	"log"
 	"net/http"
-	"regexp"
+	"package-downloader/service"
 	"strings"
 	"time"
 )
@@ -74,10 +74,13 @@ func CheckDependency(pac ToDo) (map[ToDo]bool, error) {
 	for _, target := range data.DependencyGroups {
 		if target.TargetFramework == "net6.0" {
 			for _, slice := range target.Dependencies {
-				reg := regexp.MustCompile("[][, )]")
-				depVersion := reg.ReplaceAllString(slice.Range, "${1}")
+				v, err := service.NormalizeVersion(slice.Range, "[][, )]", "${1}")
+				if err != nil {
+					log.Print("Can't normalize version")
+					break
+				}
 				depName := strings.ToLower(slice.DependencyID)
-				newDep := ToDo{depName, depVersion}
+				newDep := ToDo{depName, v}
 				p[newDep] = false
 			}
 		}
@@ -95,7 +98,7 @@ func CheckDependency(pac ToDo) (map[ToDo]bool, error) {
 
 func findMetaData(name string, version string) (*MetaData, error) {
 
-	pack, err := FindPackage(name, version)
+	pack, err := GetNugetPackage(name, version)
 	resp, err := http.Get(pack.CatalogEntry)
 	if err != nil {
 		log.Print("Wrong request.Check that you enter correct package name or version ")

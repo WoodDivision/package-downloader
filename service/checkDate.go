@@ -5,8 +5,8 @@ import (
 )
 
 func CheckDate(pac time.Time) bool {
-	tYear, tMonth, tDay := time.Now().Date()
-	if pac.Day() <= tDay && pac.Month() >= (tMonth-2) && pac.Year() == tYear {
+	today := time.Now()
+	if today.Before(pac) {
 		return false
 	}
 	return true

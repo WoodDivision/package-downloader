@@ -2,7 +2,7 @@ package npm
 
 import (
 	"log"
-	"regexp"
+	"package-downloader/service"
 )
 
 type ToDo struct {
@@ -13,11 +13,14 @@ type ToDo struct {
 var p = make(map[ToDo]bool)
 
 func CheckDependency(pac ToDo) (map[ToDo]bool, error) {
-	npmPac, _ := GetPackage(pac.Name)
-	for name, version := range npmPac.Versions[pac.Version].Dependencies {
-		reg := regexp.MustCompile("[/^|~]")
-		depVersion := reg.ReplaceAllString(version, "")
-		newDep := ToDo{Name: name, Version: depVersion}
+	npmPac, _ := GetNpmPackage(pac.Name)
+	for n, v := range npmPac.Versions[pac.Version].Dependencies {
+		v, err := service.NormalizeVersion(v, "[/^|~]", "")
+		if err != nil {
+			log.Print("Can't normalize version")
+			break
+		}
+		newDep := ToDo{Name: n, Version: v}
 		p[newDep] = false
 	}
 	for pac, load := range p {

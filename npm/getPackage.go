@@ -3,19 +3,19 @@ package npm
 import (
 	"encoding/json"
 	"fmt"
-	"io"
 	"log"
-	"net/http"
+	"package-downloader/service"
 	"strings"
+	"time"
 )
 
 type Package struct {
-	Id       string             `json:"_id"`
-	Rev      string             `json:"_rev"`
-	Name     string             `json:"name"`
-	DistTags struct{}           `json:"dist-tags"`
-	Versions map[string]Version `json:"versions"`
-	Time     map[string]string  `json:"time"`
+	Id       string               `json:"_id"`
+	Rev      string               `json:"_rev"`
+	Name     string               `json:"name"`
+	DistTags struct{}             `json:"dist-tags"`
+	Versions map[string]Version   `json:"versions"`
+	Time     map[string]time.Time `json:"time"`
 }
 
 type Version struct {
@@ -39,32 +39,19 @@ type Dist struct {
 	} `json:"signatures"`
 }
 
-var npm *Package
-
 const NPM_URL = "https://registry.npmjs.org"
 
-func GetPackage(packageName string) (*Package, error) {
+func GetNpmPackage(packageName string) (*Package, error) {
+	var npm *Package
+
 	name := strings.ToLower(packageName)
-	//version := packageVersion
 	endpoint := fmt.Sprintf("/%s", name)
 	apiURL := NPM_URL + endpoint
-	resp, err := http.Get(apiURL)
+	body := service.GetRequest(apiURL)
+	err := json.Unmarshal(body, &npm)
 	if err != nil {
-		log.Print("Wrong request.Check that you enter correct package name or version ")
-		return nil, err
+		log.Print("Can't unmarsh json for Nuget.Org")
 	}
-	defer resp.Body.Close()
 
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		log.Print("There is error in body pars")
-		return nil, err
-	}
-	err = json.Unmarshal(body, &npm)
-	if err != nil {
-		log.Print("Can't unmarsh json for registry.npmjs.org")
-		log.Print(err.Error())
-		return nil, err
-	}
-	return npm, nil
+	return npm, err
 }
