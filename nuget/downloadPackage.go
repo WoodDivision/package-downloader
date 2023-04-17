@@ -23,9 +23,6 @@ func DownloadNuget(packageName string, packageVersion string, repository string)
 		//	log.Print("Package already in Nexus")
 		//	return
 		//}
-		if err != nil {
-			return
-		}
 		fileName := fmt.Sprintf("%s.%s.nupkg", pac.Name, pac.Version)
 		nuget, err := GetNugetPackage(pac.Name, pac.Version)
 		if err != nil {

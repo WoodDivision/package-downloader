@@ -2,9 +2,8 @@ package nuget
 
 import (
 	"encoding/json"
-	"io"
 	"log"
-	"net/http"
+	"os"
 	"package-downloader/service"
 	"strings"
 	"time"
@@ -33,47 +32,37 @@ type MetaData struct {
 	Version                  string             `json:"version"`
 	DependencyGroups         []DependencyGroups `json:"dependencyGroups"`
 }
+
 type DependencyGroups struct {
-	Id              string         `json:"@id"`
-	Type            string         `json:"@type"`
 	Dependencies    []Dependencies `json:"dependencies"`
 	TargetFramework string         `json:"targetFramework"`
 }
 
 type Dependencies struct {
-	Id           string `json:"@id"`
-	Type         string `json:"@type"`
 	DependencyID string `json:"id"`
 	Range        string `json:"range"`
 }
 
-type DependenciesContext struct {
-	Id        string `json:"@id"`
-	Container string `json:"@container"`
-}
-type DependencyGroupsContext struct {
-	Id        string `json:"@id"`
-	Container string `json:"@container"`
-}
 type ToDo struct {
 	Name    string
 	Version string
 }
 
 var (
-	p        = make(map[ToDo]bool)
-	metaData *MetaData
+	p           = make(map[ToDo]bool)
+	netStandart = os.Getenv("NET_STANDART")
 )
 
 func CheckDependency(pac ToDo) (map[ToDo]bool, error) {
+	log.Printf("Processing package %s, %s ", pac.Name, pac.Version)
 	data, err := findMetaData(pac.Name, pac.Version)
 	if err != nil {
 		log.Print("Can't find MetaData for package ")
 		return nil, err
 	}
-	for _, target := range data.DependencyGroups {
-		if target.TargetFramework == "net6.0" {
-			for _, slice := range target.Dependencies {
+	for _, group := range data.DependencyGroups {
+		if group.TargetFramework == netStandart {
+			for _, slice := range group.Dependencies {
 				v, err := service.NormalizeVersion(slice.Range, "[][, )]", "${1}")
 				if err != nil {
 					log.Print("Can't normalize version")
@@ -89,7 +78,6 @@ func CheckDependency(pac ToDo) (map[ToDo]bool, error) {
 		if load == true {
 			continue
 		}
-		log.Printf("Processing package %s, %s ", dep.Name, dep.Version)
 		p[dep] = true
 		return CheckDependency(dep)
 	}
@@ -97,20 +85,11 @@ func CheckDependency(pac ToDo) (map[ToDo]bool, error) {
 }
 
 func findMetaData(name string, version string) (*MetaData, error) {
+	var metaData *MetaData
 
 	pack, err := GetNugetPackage(name, version)
-	resp, err := http.Get(pack.CatalogEntry)
-	if err != nil {
-		log.Print("Wrong request.Check that you enter correct package name or version ")
-		return nil, err
-	}
-	defer resp.Body.Close()
 
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		log.Print("There is error in body pars")
-		return nil, err
-	}
+	body := service.GetRequest(pack.CatalogEntry)
 	err = json.Unmarshal(body, &metaData)
 	if err != nil {
 		log.Print("Can't unmarsh json for Dependency")

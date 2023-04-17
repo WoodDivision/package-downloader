@@ -39,10 +39,9 @@ type Dist struct {
 	} `json:"signatures"`
 }
 
-const NPM_URL = "https://registry.npmjs.org"
+var npm *Package
 
 func GetNpmPackage(packageName string) (*Package, error) {
-	var npm *Package
 
 	name := strings.ToLower(packageName)
 	endpoint := fmt.Sprintf("/%s", name)

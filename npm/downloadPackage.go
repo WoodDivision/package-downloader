@@ -4,10 +4,14 @@ import (
 	"fmt"
 	"log"
 	"package-downloader/service"
+	"strings"
 )
 
+const NPM_URL = "https://registry.npmjs.org"
+
 func DownloadNpm(packageName string, packageVersion string, repository string) {
-	pac := ToDo{Name: packageName, Version: packageVersion}
+	name := strings.ToLower(packageName)
+	pac := ToDo{name, packageVersion}
 	packageToDownload, err := CheckDependency(pac)
 	if err != nil {
 		return
@@ -19,11 +23,11 @@ func DownloadNpm(packageName string, packageVersion string, repository string) {
 		//	log.Print("Package already in Nexus")
 		//	return
 		//}
+		fileName := fmt.Sprintf("%s-%s.tar", service.NormalizeName(pac.Name), pac.Version)
 		npm, err := GetNpmPackage(pac.Name)
 		if err != nil {
 			return
 		}
-		fileName := fmt.Sprintf("%s-%s.tar", service.NormalizeName(pac.Name), pac.Version)
 		date := service.CheckDate(npm.Time[pac.Version])
 		if date == true {
 			log.Printf(

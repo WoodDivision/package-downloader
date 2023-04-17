@@ -13,6 +13,7 @@ type ToDo struct {
 var p = make(map[ToDo]bool)
 
 func CheckDependency(pac ToDo) (map[ToDo]bool, error) {
+	log.Printf("Processing package %s, %s ", pac.Name, pac.Version)
 	npmPac, _ := GetNpmPackage(pac.Name)
 	for n, v := range npmPac.Versions[pac.Version].Dependencies {
 		v, err := service.NormalizeVersion(v, "[/^|~]", "")
@@ -27,7 +28,6 @@ func CheckDependency(pac ToDo) (map[ToDo]bool, error) {
 		if load == true {
 			continue
 		}
-		log.Printf("Processing package %s, %s ", pac.Name, pac.Version)
 		p[pac] = true
 		return CheckDependency(pac)
 	}
