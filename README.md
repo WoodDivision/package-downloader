@@ -21,3 +21,12 @@ package-downloader -n PackageName -v PackageVersion -t (npm/nuget)
 -v - указывает какой версии пакет должен соответствовать 
 
 -t - указать тип пакета
+
+Примеры без компиляции 
+````shell
+go run main.go -n HotChocolate -v 13.0.5 -t nuget 
+go run main.go -n System.Diagnostics.PerformanceCounter -v 8.0.0-preview.3.23174.8 -t nuget 
+
+go run main.go -n api -v 5.0.8 -t npm 
+go run main.go -n @babel/core -v 7.0.0 -t npm 
+````
