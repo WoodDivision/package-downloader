@@ -1,4 +1,4 @@
-package npmClient
+package npm
 
 import (
 	"package-downloader/rest"
@@ -7,6 +7,10 @@ import (
 
 type NpmPackage struct {
 	Client *rest.Client
+}
+
+type NpmError struct {
+	Error string `json:"error"`
 }
 
 type Package struct {
@@ -30,13 +34,15 @@ type Version struct {
 }
 
 type Dist struct {
-	Shasum     string `json:"shasum"`
-	Tarball    string `json:"tarball"`
-	Integrity  string `json:"integrity"`
-	Signatures []struct {
-		Keyid string `json:"keyid"`
-		Sig   string `json:"sig"`
-	} `json:"signatures"`
+	Shasum     string       `json:"shasum"`
+	Tarball    string       `json:"tarball"`
+	Integrity  string       `json:"integrity"`
+	Signatures []Signatures `json:"signatures"`
+}
+
+type Signatures struct {
+	Keyid string `json:"keyid"`
+	Sig   string `json:"sig"`
 }
 
 type ToDo struct {

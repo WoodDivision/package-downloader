@@ -1,4 +1,4 @@
-package nexusClient
+package nexus
 
 import (
 	"encoding/json"

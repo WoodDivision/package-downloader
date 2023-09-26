@@ -8,7 +8,10 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"net/url"
 	"os"
+	"package-downloader/rest/npm"
+	"package-downloader/rest/nuget"
 	"regexp"
 	"strings"
 	"time"
@@ -18,8 +21,14 @@ type Client struct {
 	user, pass, token          string
 	NexusUrl, NugetUrl, NpmUrl string
 	HTTPClient                 *http.Client
-	NugetClient                *nugetClient.NugetPackage
-	NpmClient                  *npmClient.NpmPackage
+	NugetClient                *nuget.NugetPackage
+	NpmClient                  *npm.NpmPackage
+}
+
+type Error struct {
+	Code    string `xml:"code,omitempty"`
+	Message string `xml:"message,omitempty"`
+	Error   string `json:"error,omitempty"`
 }
 
 const (
@@ -36,8 +45,8 @@ func NewClient(usr string, pas string, url string) *Client {
 		NugetUrl:   urlNuget,
 		NpmUrl:     urlNpm,
 	}
-	c.NugetClient = &nugetClient.NugetPackage{Client: c}
-	c.NpmClient = &npmClient.NpmPackage{Client: c}
+	c.NugetClient = &nuget.NugetPackage{Client: c}
+	c.NpmClient = &npm.NpmPackage{Client: c}
 	return c
 }
 
@@ -115,21 +124,16 @@ func (c *Client) NormalizeName(name string) string {
 	return name
 }
 
-func (c *Client) GetRequest(url string) []byte {
-	resp, err := http.Get(url)
-	if err != nil {
-		log.Print("Wrong request.Check that you enter correct url")
+func (c *Client) SendRequest(method string, u *url.URL, v interface{}) error {
+	req := &http.Request{
+		Method:     method,
+		URL:        u,
+		Proto:      "HTTP/1.1",
+		ProtoMajor: 1,
+		ProtoMinor: 1,
+		Header:     make(http.Header),
+		Host:       u.Host,
 	}
-	defer resp.Body.Close()
-
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		log.Print("There is error in body pars")
-	}
-	return body
-}
-
-func (c *Client) SendRequest(req *http.Request, v interface{}, errRes interface{}) error {
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Accept", "application/json")
 	req.SetBasicAuth(c.user, c.pass)
@@ -140,30 +144,28 @@ func (c *Client) SendRequest(req *http.Request, v interface{}, errRes interface{
 	}
 
 	if res.StatusCode < http.StatusOK || res.StatusCode >= http.StatusBadRequest {
+		var errRes *Error
 		if err = json.NewDecoder(res.Body).Decode(&errRes); err == nil {
-			//return errors.New()
+			if errRes.Error != "" {
+				return errors.New(errRes.Error)
+			}
+			if errRes.Message != "" {
+				return errors.New(errRes.Message)
+			}
 		}
-
-		return fmt.Errorf("unknown error, status code: %d", res.StatusCode)
+		return fmt.Errorf("status code: %d", res.StatusCode)
 	}
-	defer res.Body.Close()
+	defer func(Body io.ReadCloser) {
+		err := Body.Close()
+		if err != nil {
+			log.Printf("Unknow Error in Body.Close")
+			return
+		}
+	}(res.Body)
 	err = json.NewDecoder(res.Body).Decode(&v)
 	if err != nil {
 		return err
 	}
+	log.Printf("%#v", v)
 	return nil
 }
-
-//func (c *Client) SetUrlOpt(options interface{}) (*url.URL, error) {
-//
-//	u := url.URL{}
-//
-//	if options != nil {
-//		q, err := query.Values(options)
-//		if err != nil {
-//			return nil, err
-//		}
-//		u.RawQuery = q.Encode()
-//	}
-//	return &u, nil
-//}

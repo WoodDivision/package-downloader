@@ -1,4 +1,4 @@
-package npmClient
+package npm
 
 import (
 	"fmt"

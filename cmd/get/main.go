@@ -21,5 +21,4 @@ func main() {
 	flag.Parse()
 	c := rest.NewClient("khristolyubov", "qwB6jr_nm", "https://nexus.action-media.ru/")
 	c.NpmClient.DownloadDependency(name, version, repository)
-
 }

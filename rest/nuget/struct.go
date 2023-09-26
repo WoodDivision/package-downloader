@@ -1,4 +1,4 @@
-package nugetClient
+package nuget
 
 import (
 	"package-downloader/rest"
@@ -7,11 +7,6 @@ import (
 
 type NugetPackage struct {
 	Client *rest.Client
-}
-
-type NpmError struct {
-	Code    string `json:"code"`
-	Message string `json:"message"`
 }
 
 type Package struct {
