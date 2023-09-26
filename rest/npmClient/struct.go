@@ -1,4 +1,4 @@
-package npm
+package npmClient
 
 import (
 	"package-downloader/rest"

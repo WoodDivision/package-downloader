@@ -9,8 +9,6 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"package-downloader/rest/npm"
-	"package-downloader/rest/nuget"
 	"regexp"
 	"strings"
 	"time"
@@ -20,8 +18,8 @@ type Client struct {
 	user, pass, token          string
 	NexusUrl, NugetUrl, NpmUrl string
 	HTTPClient                 *http.Client
-	NugetClient                *nuget.NugetPackage
-	NpmClient                  *npm.NpmPackage
+	NugetClient                *nugetClient.NugetPackage
+	NpmClient                  *npmClient.NpmPackage
 }
 
 const (
@@ -38,8 +36,8 @@ func NewClient(usr string, pas string, url string) *Client {
 		NugetUrl:   urlNuget,
 		NpmUrl:     urlNpm,
 	}
-	c.NugetClient = &nuget.NugetPackage{Client: c}
-	c.NpmClient = &npm.NpmPackage{Client: c}
+	c.NugetClient = &nugetClient.NugetPackage{Client: c}
+	c.NpmClient = &npmClient.NpmPackage{Client: c}
 	return c
 }
 

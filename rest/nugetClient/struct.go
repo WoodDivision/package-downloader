@@ -1,4 +1,4 @@
-package nuget
+package nugetClient
 
 import (
 	"package-downloader/rest"

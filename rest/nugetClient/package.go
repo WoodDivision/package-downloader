@@ -1,4 +1,4 @@
-package nuget
+package nugetClient
 
 import (
 	"encoding/json"

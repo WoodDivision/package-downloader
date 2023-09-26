@@ -1,4 +1,4 @@
-package downloadNpm
+package get
 
 import (
 	"flag"
@@ -18,6 +18,8 @@ func main() {
 	flag.StringVar(&name, "n", "", "Package name")
 	flag.StringVar(&version, "v", "", "Package version")
 	flag.StringVar(&repository, "r", "nuget-freeze", "Package repository name in Nexus.Action")
+	flag.Parse()
 	c := rest.NewClient("khristolyubov", "qwB6jr_nm", "https://nexus.action-media.ru/")
-	c.NugetClient.DownloadDependency(name, version, repository)
+	c.NpmClient.DownloadDependency(name, version, repository)
+
 }

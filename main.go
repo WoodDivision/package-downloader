@@ -1,5 +1,7 @@
 package main
 
+import "package-downloader/cmd"
+
 //
 //import (
 //	"flag"
@@ -35,3 +37,7 @@ package main
 //		fmt.Print("here will be a default downloader section")
 //	}
 //}
+
+func main() {
+	cmd.Execute()
+}
